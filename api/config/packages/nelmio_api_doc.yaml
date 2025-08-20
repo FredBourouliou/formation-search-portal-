@@ -1,0 +1,50 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Emfor API
+            description: API REST pour la recherche de formations
+            version: 1.0.0
+        servers:
+            - url: http://localhost:8080
+              description: Local development server
+        components:
+            schemas:
+                Formation:
+                    type: object
+                    properties:
+                        id:
+                            type: string
+                            format: uuid
+                        titre:
+                            type: string
+                        organisme:
+                            type: string
+                        departement:
+                            type: string
+                        ville:
+                            type: string
+                        modalite:
+                            type: string
+                            enum: [presentiel, distanciel, hybride]
+                        latitude:
+                            type: number
+                            format: float
+                            nullable: true
+                        longitude:
+                            type: number
+                            format: float
+                            nullable: true
+                        date_debut:
+                            type: string
+                            format: date-time
+                            nullable: true
+                        date_fin:
+                            type: string
+                            format: date-time
+                            nullable: true
+                        url:
+                            type: string
+                            nullable: true
+    areas:
+        path_patterns:
+            - ^/(?!api/docs|_profiler|_wdt)
