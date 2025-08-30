@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: emfor
+      MYSQL_USER: emfor
+      MYSQL_PASSWORD: emforpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - emfor_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  api:
+    build: ./api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://root:rootpass@db:3306/emfor
+      APP_ENV: dev
+      APP_DEBUG: 1
+      CORS_ALLOW_ORIGIN: '^https?://localhost:(5173|8081)$'
+    volumes:
+      - ./api:/app
+      - composer_cache:/root/.composer
+    networks:
+      - emfor_network
+
+  web:
+    image: caddy:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./api/public:/srv/public
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - api
+    networks:
+      - emfor_network
+
+  frontend:
+    build: 
+      context: ./frontend
+      target: dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    networks:
+      - emfor_network
+    command: npm run dev
+
+  frontend_web:
+    image: caddy:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./frontend/dist:/srv
+      - ./docker/caddy/Caddyfile.static:/etc/caddy/Caddyfile
+    depends_on:
+      - frontend
+    networks:
+      - emfor_network
+
+networks:
+  emfor_network:
+    driver: bridge
+
+volumes:
+  db_data:
+  composer_cache:
