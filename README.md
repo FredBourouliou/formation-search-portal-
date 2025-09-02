@@ -4,6 +4,9 @@ Monorepo avec API Symfony 7 et Frontend React 18 pour recherche de formations av
 
 > **🎯 Démarrage en une seule commande : `./start.sh`**
 
+![Capture d'écran de l'application Emfor POC](capture1.png)
+*Interface de recherche de formations avec carte interactive Leaflet*
+
 ## 🚀 Démarrage rapide
 
 ### Prérequis
